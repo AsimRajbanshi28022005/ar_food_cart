@@ -1,0 +1,85 @@
+ডাটাবেস (arfood_db)                                                                     
+Collation: utf8mb4_general_ci
+users টেবিল   row >7
+
+
+//SQL  uplod and click ok// 
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    phone VARCHAR(20) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    avatar LONGBLOB NULL,
+    registered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                                 
+
+
+//format table//
+
+id
+name
+email
+phone
+password_hash
+avatar
+registered_at 
+-----------------------------------------------------------------
+-- ডাটাবেস তৈরি
+CREATE DATABASE IF NOT EXISTS arfood_db
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+
+USE arfood_db;
+
+-- পুরোনো টেবিল থাকলে ডিলিট (সতর্কতা: এতে আগের ডাটা মুছে যাবে)
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS users;
+
+-- users টেবিল
+CREATE TABLE users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    phone VARCHAR(20) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    pin VARCHAR(10) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    avatar LONGBLOB NULL,
+    registered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- orders টেবিল
+CREATE TABLE orders (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_code VARCHAR(50) NOT NULL UNIQUE,
+    user_id INT UNSIGNED NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    pin VARCHAR(10) NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    upi_id VARCHAR(100) DEFAULT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_orders_user_id (user_id),
+    CONSTRAINT fk_orders_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- order_items টেবিল
+CREATE TABLE order_items (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id INT UNSIGNED NOT NULL,
+    order_code VARCHAR(50) NOT NULL,
+    item_name VARCHAR(150) NOT NULL,
+    quantity INT UNSIGNED NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_items_order_id (order_id),
+    CONSTRAINT fk_items_order
+        FOREIGN KEY (order_id) REFERENCES orders(id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
